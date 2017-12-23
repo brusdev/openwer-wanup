@@ -1,0 +1,35 @@
+#!/bin/sh
+
+COUNTER=0
+PASS=0
+  
+while [ $PASS -eq 0 ]
+do
+  grep "unknown" /sys/class/net/pppoe-wan/operstate
+  RESULT="$?"
+  logger -t DEBUG "The wan first check is ${RESULT}"
+  
+  if [ "$RESULT" != 0 ]; then
+    sleep 10 #sec
+    grep "unknown" /sys/class/net/pppoe-wan/operstate > /dev/null
+    RESULT="$?"
+    logger -t DEBUG "The wan second check is ${RESULT}"
+
+    if [ "$RESULT" != 0 ]; then
+
+      let COUNTER++
+      logger -t DEBUG "Attempt #${COUNTER} to reconnect wan"
+  
+      ifup wan
+      sleep 30 #sec
+
+    else
+      PASS=1
+      logger -t DEBUG "The wan is connected"
+    fi
+      
+  else
+    PASS=1
+    logger -t DEBUG "The wan is connected"
+  fi
+done

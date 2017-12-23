@@ -1,0 +1,7 @@
+# Place me in /etc/hotplug.d/iface/99-keepwanalive
+
+if [ "$ACTION" = "ifdown" -a "$INTERFACE" = "wan" ]; then
+
+  /etc/wanup
+
+fi
